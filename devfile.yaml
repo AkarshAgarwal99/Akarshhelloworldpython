@@ -1,0 +1,31 @@
+apiVersion: 1.0.0
+metadata:
+  name: hello-world
+  namespace: dev
+spec:
+  commands:
+  - id: install-kubernetes
+    command: oc cluster up --public-hostname=localhost
+  - id: configure-kubernetes
+    command: oc login -u developer -p developer
+  - id: deploy
+    command: kubectl apply -f deployment.yaml
+  projects:
+  - name: hello-world
+    container:
+      image: python:3.8-slim-buster
+      command: ["python", "main.py"]
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      mounts:
+      - mountPath: /app
+        source: .
+    sourceMapping:
+      localPath: .
+      remotePath: /app
+  components:
+  - name: hello-world
+    type: container
+    endpoint:
+      port: 8080
